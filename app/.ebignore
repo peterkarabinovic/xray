@@ -1,0 +1,7 @@
+postgresql-data/*
+postgresql-data
+docker-compose-dev.yml
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+
+

@@ -1,0 +1,16 @@
+{
+  "name": "xray-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "postgraphile --host 0.0.0.0 -c \"postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}\" --enhance-graphiql --dynamic-json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "postgraphile": "^4.13.0"
+  }
+}
+

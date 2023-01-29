@@ -1,0 +1,66 @@
+
+upstream frontend {
+  server frontend:3000;
+}
+
+upstream backend {
+  server backend:3001;
+}
+
+
+upstream hvgb {
+  server hvgb:3003;
+}
+
+server {
+    listen 8080 default_server;
+
+    set $redirect 0;
+    if ($http_x_forwarded_proto != "https") {
+        set $redirect 1;
+    }
+    if ($http_user_agent ~* "ELB-HealthChecker") {
+        set $redirect 0;
+    }
+    if ($host = "localhost"){
+        set $redirect 0;
+    }
+    if ($redirect = 1) {
+        return 301 https://$host$request_uri;
+    }
+
+
+    # Ensure timeouts are equal across browsers.
+    keepalive_timeout 60;
+
+    location /v3 {
+        proxy_pass  http://backend;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_max_temp_file_size 0;
+        client_body_buffer_size 5M;
+    }
+
+    location /hvgb/ {
+        proxy_pass  http://hvgb/;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_max_temp_file_size 0;
+        client_body_buffer_size 5M;
+    }
+
+    location / {
+        proxy_pass http://frontend;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_max_temp_file_size 0;
+        proxy_request_buffering off;
+        client_body_buffer_size 5M;
+    }
+}

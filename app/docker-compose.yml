@@ -1,0 +1,39 @@
+
+version: "3.5"
+
+
+services:
+
+  nginx:
+    depends_on:
+      - app
+    image: nginx:1.19-alpine
+    container_name: nginx
+    volumes: 
+      - /var/app/current/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:8080
+    logging:
+      driver: "none"
+    # restart: always 
+
+  # 
+  #  Backend API
+  #
+  app:
+    image: node:18-alpine
+    container_name: app
+    environment: 
+      - DB_HOST
+      - DB_PORT
+      - DB_NAME
+      - DB_PASSWORD
+      - DB_USERNAME
+    working_dir: /app 
+    volumes: 
+        - /var/app/current/app:/app
+    ports:
+      - 5000:5000        
+    command: npm run start
+    # restart: on-failure
+
